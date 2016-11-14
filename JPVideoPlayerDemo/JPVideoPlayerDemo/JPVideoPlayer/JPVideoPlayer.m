@@ -297,7 +297,9 @@
         _showView.alpha = 0;
     } completion:^(BOOL finished) {
         for (CALayer *layer in _showView.subviews) {
+            if ([layer isKindOfClass:[CALayer class]]) {
             [layer removeFromSuperlayer];
+            }
         }
         [_showView.layer addSublayer:self.currentPlayerLayer];
         
