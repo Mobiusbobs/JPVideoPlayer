@@ -293,15 +293,17 @@
 -(void)handleShowViewSublayers{
     
     // Here have a fade in animation
-    [UIView animateWithDuration:0.4 animations:^{
-        _showView.alpha = 0;
+    [UIView animateWithDuration:0 animations:^{
+        _showView.alpha = 1;
     } completion:^(BOOL finished) {
         for (CALayer *layer in _showView.subviews) {
-            [layer removeFromSuperlayer];
+            if ([layer isKindOfClass:[CALayer class]]) {
+                [layer removeFromSuperlayer];
+            }
         }
         [_showView.layer addSublayer:self.currentPlayerLayer];
         
-        [UIView animateWithDuration:0.5 animations:^{
+        [UIView animateWithDuration:0 animations:^{
             _showView.alpha = 1;
             
         } completion:nil];
