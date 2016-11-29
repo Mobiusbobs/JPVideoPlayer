@@ -26,7 +26,9 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "JPCacheManager.h"
 
+@protocol JPVideoPlayerLoadingDelegate;
 @interface JPVideoPlayer : NSObject
 
 /**
@@ -55,6 +57,16 @@
  */
 - (void)playWithUrl:(NSURL *)url showView:(UIView *)showView;
 
+/**
+ * Default is YES
+ */
+@property (nonatomic, assign) BOOL showActivityWhenLoading;
+/**
+ * The loading view before video play
+ * 视频加载视图 默认为系统UIActivityIndicatorView
+ * Default is UIActivityIndicatorView
+ */
+@property (nonatomic,strong) UIView<JPVideoPlayerLoadingDelegate> *loadingView;
 
 /**
  * Default is YES
@@ -67,9 +79,40 @@
  */
 @property(nonatomic, assign)BOOL mute;
 
-- (void)resume;
-- (void)pause;
-- (void)stop;
+-(void)resume;
+-(void)pause;
+-(void)stop;
 
+/**
+ * Clear video cache for the given url asynchronously.
+ * 清除指定URL的缓存视频文件(异步).
+ * @param url   the url of video file.
+ */
+-(void)clearVideoCacheForUrl:(NSURL *)url;
+
+/**
+ * Clear complete files and temporary files asynchronously.
+ * 清除所有的缓存(异步), 包括完整视频文件和临时视频文件.
+ */
+-(void)clearAllVideoCache;
+
+/**
+ * Get the total size of complete files and temporary files asynchronously.
+ * 获取缓存总大小(异步), 包括完整视频文件和临时视频文件.
+ */
+-(void)getSize:(JPCacheQueryCompletedBlock)completedOperation;
+
+@end
+
+/**
+ * Use custom loading need implement this protocol
+ * 使用自定义的loading时 需实现此协议
+ * hidesWhenStopped   default is YES.
+ */
+@protocol JPVideoPlayerLoadingDelegate <NSObject>
+
+@required
+- (void)startAnimating;
+- (void)stopAnimating;
 
 @end
