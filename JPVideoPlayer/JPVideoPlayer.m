@@ -270,11 +270,12 @@
                 
                 // When get ready to play note, we can go to play, and can add the video picture on show view.
                 // 显示图像逻辑
-                
+                if ([self.showView.window isKeyWindow]) {
                 [self.player play];
                 self.player.muted = self.mute;
                 [self handleShowViewSublayers];
-                [self stopLoading];
+                    [self stopLoading];
+                }
             }
                 break;
                 
