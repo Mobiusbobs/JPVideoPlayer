@@ -26,10 +26,17 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <AVKit/AVKit.h>
 #import "JPCacheManager.h"
 
 @protocol JPVideoPlayerLoadingDelegate;
 @interface JPVideoPlayer : NSObject
+
+
+/**
+ * player
+ */
+@property(nonatomic, strong)AVPlayer *player;
 
 /**
  * Singleton
