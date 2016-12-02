@@ -155,8 +155,16 @@
         self.player = [AVPlayer playerWithPlayerItem:playerItem];
         self.currentPlayerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
         self.currentPlayerLayer.frame = CGRectMake(0, 0, _showView.bounds.size.width, _showView.bounds.size.height);
-    }
-    else{
+    } else if ([[url absoluteString] hasPrefix:@"assets-library"]){
+        NSLog(@"相簿影片");
+        NSLog(@"%@", [url absoluteString]);
+        AVURLAsset *videoURLAsset = [AVURLAsset URLAssetWithURL:url options:nil];
+        AVPlayerItem *playerItem = [AVPlayerItem playerItemWithAsset:videoURLAsset];
+        self.currentPlayerItem = playerItem;
+        self.player = [AVPlayer playerWithPlayerItem:playerItem];
+        self.currentPlayerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
+        self.currentPlayerLayer.frame = CGRectMake(0, 0, _showView.bounds.size.width, _showView.bounds.size.height);
+    } else {
       
         // Re-create all all configuration agian.
         // Make the "resourceLoader" become the delegate of "videoURLAsset", and provide data to the player.
