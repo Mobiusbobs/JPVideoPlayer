@@ -39,6 +39,12 @@
 @property(nonatomic, strong)AVPlayer *player;
 
 /**
+ * The view of video will play on
+ * 视频图像载体View
+ */
+@property (nonatomic, weak)UIView *showView;
+
+/**
  * Singleton
  * 单例
  */

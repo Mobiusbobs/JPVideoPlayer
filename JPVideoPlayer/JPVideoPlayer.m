@@ -35,12 +35,6 @@
 @property (nonatomic, strong)AVPlayerLayer *currentPlayerLayer;
 
 /**
- * The view of video will play on
- * 视频图像载体View
- */
-@property (nonatomic, weak)UIView *showView;
-
-/**
  * The loading view before video play
  * 视频加载载体View
  */
