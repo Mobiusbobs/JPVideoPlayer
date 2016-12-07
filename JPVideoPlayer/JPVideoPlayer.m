@@ -243,6 +243,9 @@
 }
 
 - (void)appDidEnterPlayGround{
+    if (![self.showView.window isKeyWindow]) {
+        return;
+    }
     [self resume];
 }
 
@@ -250,6 +253,10 @@
     
     // Seek the start point of file data and repeat play, this handle have no Memory surge
     // 重复播放, 从起点开始重播, 没有内存暴涨
+    
+    if (![self.showView.window isKeyWindow]) {
+        return;
+    }
     
     __weak typeof(self) weak_self = self;
     [self.player seekToTime:CMTimeMake(0, 1) completionHandler:^(BOOL finished) {
