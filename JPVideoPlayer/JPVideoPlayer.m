@@ -258,6 +258,11 @@
         return;
     }
     
+    if(self.player.status != AVPlayerStatusReadyToPlay ||
+       self.player.currentItem.status != AVPlayerItemStatusReadyToPlay) {
+        return;
+    }
+    
     __weak typeof(self) weak_self = self;
     [self.player seekToTime:CMTimeMake(0, 1) completionHandler:^(BOOL finished) {
         __strong typeof(weak_self) strong_self = weak_self;
