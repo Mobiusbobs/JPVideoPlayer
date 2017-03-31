@@ -10,6 +10,8 @@
  */
 
 
+#import <AssetsLibrary/AssetsLibrary.h>
+
 #import "JPVideoPlayerManager.h"
 #import "JPVideoPlayerCompat.h"
 #import "JPVideoPlayerCachePathTool.h"
@@ -165,6 +167,32 @@
             [self callCompletionBlockForOperation:operation completion:completedBlock videoPath:nil error:[NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorFileDoesNotExist userInfo:nil] cacheType:JPVideoPlayerCacheTypeNone url:url];
             return operation;
         }
+    } else if ([url.scheme isEqualToString:@"assets-library"]) {
+        NSLog(@"is album url");
+        
+        ALAssetsLibrary *assetLibrary=[[ALAssetsLibrary alloc] init];
+        [assetLibrary assetForURL:url
+                      resultBlock:^(ALAsset *asset)
+         {
+             ALAssetRepresentation *rep = [asset defaultRepresentation];
+             Byte *buffer = (Byte*)malloc(rep.size);
+             NSUInteger buffered = [rep getBytes:buffer fromOffset:0.0 length:rep.size error:nil];
+             NSData *data = [NSData dataWithBytesNoCopy:buffer length:buffered freeWhenDone:YES];
+             
+             [self.videoCache storeVideoData:data expectedSize:buffered forKey:key completion:^(NSUInteger storedSize, NSError * _Nullable error, NSString * _Nullable fullVideoCachePath) {
+                 [[JPVideoPlayerPlayVideoTool sharedTool] playExistedVideoWithURL:url fullVideoCachePath:fullVideoCachePath options:options showOnView:showView error:^(NSError * _Nullable error) {
+                     if (completedBlock) {
+                         completedBlock(nil, error, JPVideoPlayerCacheTypeLocation, url);
+                     }
+                 }];
+                 [JPVideoPlayerPlayVideoTool sharedTool].delegate = self;
+             }];
+         }
+                     failureBlock:^(NSError *error)
+         {
+             if (completedBlock) {
+                 completedBlock(nil, error, JPVideoPlayerCacheTypeLocation, url);
+             }         }];
     }
     else{
         operation.cacheOperation = [self.videoCache queryCacheOperationForKey:key done:^(NSString * _Nullable videoPath, JPVideoPlayerCacheType cacheType) {

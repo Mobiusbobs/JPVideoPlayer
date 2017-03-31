@@ -9,7 +9,6 @@
  * or http://www.jianshu.com/users/e2f2d779c022/latest_articles to contact me.
  */
 
-
 #import "JPVideoPlayerPlayVideoTool.h"
 #import "JPVideoPlayerResourceLoader.h"
 #import "UIView+PlayerStatusAndDownloadIndicator.h"
@@ -122,6 +121,10 @@ static NSString *JPVideoPlayerURL = @"www.newpan.com";
     self.resourceLoader = nil;
 }
 
+-(UIView *)playingView
+{
+    return self.unownShowView;
+}
 @end
 
 
@@ -309,6 +312,15 @@ static NSString *JPVideoPlayerURL = @"www.newpan.com";
     }
 }
 
+- (void)pauseVideo
+{
+    [self.currentPlayVideoItem pausePlayVideo];
+}
+
+- (void)resumeVideo
+{
+    [self.currentPlayVideoItem resumePlayVideo];
+}
 
 #pragma mark -----------------------------------------
 #pragma mark App Observer
