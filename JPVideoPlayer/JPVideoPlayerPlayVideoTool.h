@@ -23,6 +23,11 @@ extern CGFloat const JPVideoPlayerLayerFrameY;
  */
 @property(nonatomic, strong, readonly, nonnull)NSString *playingKey;
 
+/**
+ * The current playing view.
+ */
+@property(nonatomic, weak, readonly, nullable)UIView *playingView;
+
 @end
 
 @class JPVideoPlayerPlayVideoTool;
@@ -122,5 +127,15 @@ typedef void(^JPVideoPlayerPlayVideoToolErrorBlock)(NSError * _Nullable error);
  * Call this method to stop play video.
  */
 -(void)stopPlay;
+
+/**
+ * Call this method to pause video.
+ */
+-(void)pauseVideo;
+
+/**
+ * Call this method to resume video.
+ */
+-(void)resumeVideo;
 
 @end

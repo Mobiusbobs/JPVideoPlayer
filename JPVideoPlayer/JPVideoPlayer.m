@@ -35,6 +35,12 @@
 @property (nonatomic, strong)AVPlayerLayer *currentPlayerLayer;
 
 /**
+ * The view of video will play on
+ * 视频图像载体View
+ */
+@property (nonatomic, weak)UIView *showView;
+
+/**
  * The loading view before video play
  * 视频加载载体View
  */
@@ -51,6 +57,11 @@
  * 播放视频url
  */
 @property(nonatomic, strong)NSURL *playPathURL;
+
+/**
+ * player
+ */
+@property(nonatomic, strong)AVPlayer *player;
 
 /**
  * Is self observer the notification
@@ -149,16 +160,8 @@
         self.player = [AVPlayer playerWithPlayerItem:playerItem];
         self.currentPlayerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
         self.currentPlayerLayer.frame = CGRectMake(0, 0, _showView.bounds.size.width, _showView.bounds.size.height);
-    } else if ([[url absoluteString] hasPrefix:@"assets-library"]){
-        NSLog(@"相簿影片");
-        NSLog(@"%@", [url absoluteString]);
-        AVURLAsset *videoURLAsset = [AVURLAsset URLAssetWithURL:url options:nil];
-        AVPlayerItem *playerItem = [AVPlayerItem playerItemWithAsset:videoURLAsset];
-        self.currentPlayerItem = playerItem;
-        self.player = [AVPlayer playerWithPlayerItem:playerItem];
-        self.currentPlayerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
-        self.currentPlayerLayer.frame = CGRectMake(0, 0, _showView.bounds.size.width, _showView.bounds.size.height);
-    } else {
+    }
+    else{
       
         // Re-create all all configuration agian.
         // Make the "resourceLoader" become the delegate of "videoURLAsset", and provide data to the player.
@@ -243,9 +246,6 @@
 }
 
 - (void)appDidEnterPlayGround{
-    if (![self.showView.window isKeyWindow]) {
-        return;
-    }
     [self resume];
 }
 
@@ -253,15 +253,6 @@
     
     // Seek the start point of file data and repeat play, this handle have no Memory surge
     // 重复播放, 从起点开始重播, 没有内存暴涨
-    
-    if (![self.showView.window isKeyWindow]) {
-        return;
-    }
-    
-    if(self.player.status != AVPlayerStatusReadyToPlay ||
-       self.player.currentItem.status != AVPlayerItemStatusReadyToPlay) {
-        return;
-    }
     
     __weak typeof(self) weak_self = self;
     [self.player seekToTime:CMTimeMake(0, 1) completionHandler:^(BOOL finished) {
@@ -284,12 +275,11 @@
                 
                 // When get ready to play note, we can go to play, and can add the video picture on show view.
                 // 显示图像逻辑
-                if ([self.showView.window isKeyWindow]) {
+                
                 [self.player play];
                 self.player.muted = self.mute;
                 [self handleShowViewSublayers];
-                    [self stopLoading];
-                }
+                [self stopLoading];
             }
                 break;
                 
@@ -335,7 +325,7 @@
         // 添加监听
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterBackground) name:UIApplicationWillResignActiveNotification object:nil];
-//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterPlayGround) name:UIApplicationDidBecomeActiveNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterPlayGround) name:UIApplicationDidBecomeActiveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidPlayToEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveMemoryWarning) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(viewDealloc:) name:@"kViewDeallocNote" object:nil];
