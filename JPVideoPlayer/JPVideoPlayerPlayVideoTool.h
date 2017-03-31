@@ -66,6 +66,19 @@ typedef void(^JPVideoPlayerPlayVideoToolErrorBlock)(NSError * _Nullable error);
  */
 @property(nonatomic, strong, readonly, nullable)JPVideoPlayerPlayVideoToolItem *currentPlayVideoItem;
 
+# pragma mark - Play asset library video existed in disk.
+
+/**
+ * Play the asset library video file in disk.
+ *
+ * @param url                the video url to play.
+ * @param showView           the view to show the video display layer.
+ * @param error              the error for 'fullVideoCachePath' and 'showLayer'.
+ *
+ * @return  token (@see JPVideoPlayerPlayVideoToolItem) that can be passed to -stopPlayVideo: to stop play.
+ */
+-(nullable JPVideoPlayerPlayVideoToolItem *)playAssetLibraryVideoWithURL:(NSURL * _Nullable)url options:(JPVideoPlayerOptions)options showOnView:(UIView * _Nullable)showView error:(nullable JPVideoPlayerPlayVideoToolErrorBlock)error;
+
 
 # pragma mark - Play video existed in disk.
 

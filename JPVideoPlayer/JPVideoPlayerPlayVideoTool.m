@@ -158,6 +158,62 @@ static NSString *JPVideoPlayerURL = @"www.newpan.com";
 #pragma mark -----------------------------------------
 #pragma mark Public
 
+-(nullable JPVideoPlayerPlayVideoToolItem *)playAssetLibraryVideoWithURL:(NSURL * _Nullable)url options:(JPVideoPlayerOptions)options showOnView:(UIView * _Nullable)showView error:(nullable JPVideoPlayerPlayVideoToolErrorBlock)error
+{
+    
+    if (url.absoluteString.length==0) {
+        if (error) error([NSError errorWithDomain:@"the file path is disable" code:0 userInfo:nil]);
+        return nil;
+    }
+
+    if (!showView) {
+        if (error) error([NSError errorWithDomain:@"the layer to display video layer is nil" code:0 userInfo:nil]);
+        return nil;
+    }
+    
+    JPVideoPlayerPlayVideoToolItem *item = [JPVideoPlayerPlayVideoToolItem new];
+    item.unownShowView = showView;
+    AVURLAsset *videoURLAsset = [AVURLAsset URLAssetWithURL:url options:nil];
+    AVPlayerItem *playerItem = [AVPlayerItem playerItemWithAsset:videoURLAsset];
+    {
+        item.url = url;
+        item.currentPlayerItem = playerItem;
+        [playerItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
+        [playerItem addObserver:self forKeyPath:@"playbackBufferEmpty" options:NSKeyValueObservingOptionNew context:nil];
+        [playerItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:NSKeyValueObservingOptionNew context:nil];
+        
+        item.player = [AVPlayer playerWithPlayerItem:playerItem];
+        item.currentPlayerLayer = [AVPlayerLayer playerLayerWithPlayer:item.player];
+        {
+            NSString *videoGravity = nil;
+            if (options&JPVideoPlayerLayerVideoGravityResizeAspect) {
+                videoGravity = AVLayerVideoGravityResizeAspect;
+            }
+            else if (options&JPVideoPlayerLayerVideoGravityResize){
+                videoGravity = AVLayerVideoGravityResize;
+            }
+            else if (options&JPVideoPlayerLayerVideoGravityResizeAspectFill){
+                videoGravity = AVLayerVideoGravityResizeAspectFill;
+            }
+            item.currentPlayerLayer.videoGravity = videoGravity;
+        }
+        item.currentPlayerLayer.frame = CGRectMake(0, 0, showView.bounds.size.width, showView.bounds.size.height);
+        item.error = error;
+        item.playingKey = [[JPVideoPlayerManager sharedManager] cacheKeyForURL:url];
+    }
+    
+    if (options & JPVideoPlayerMutedPlay) {
+        item.player.muted = YES;
+    }
+    
+    @synchronized (self) {
+        [self.playVideoItems addObject:item];
+    }
+    self.currentPlayVideoItem = item;
+    
+    return item;
+}
+
 -(nullable JPVideoPlayerPlayVideoToolItem *)playExistedVideoWithURL:(NSURL * _Nullable)url fullVideoCachePath:(NSString * _Nullable)fullVideoCachePath options:(JPVideoPlayerOptions)options showOnView:(UIView * _Nullable)showView error:(nullable JPVideoPlayerPlayVideoToolErrorBlock)error{
     
     if (fullVideoCachePath.length==0) {
