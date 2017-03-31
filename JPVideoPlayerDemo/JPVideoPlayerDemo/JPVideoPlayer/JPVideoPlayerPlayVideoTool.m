@@ -125,6 +125,11 @@ static NSString *JPVideoPlayerURL = @"www.newpan.com";
 {
     return self.unownShowView;
 }
+
+-(BOOL)isPlaying
+{
+    return self.player.rate > 0;
+}
 @end
 
 

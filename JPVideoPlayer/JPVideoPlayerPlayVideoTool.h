@@ -28,6 +28,11 @@ extern CGFloat const JPVideoPlayerLayerFrameY;
  */
 @property(nonatomic, weak, readonly, nullable)UIView *playingView;
 
+/**
+ * The current playing status.
+ */
+@property(nonatomic, assign, readonly) BOOL isPlaying;
+
 @end
 
 @class JPVideoPlayerPlayVideoTool;
