@@ -74,6 +74,11 @@ CGFloat const JPVideoPlayerLayerFrameY = 2;
  */
 @property(nonatomic, strong, nonnull)NSString *playingKey;
 
+/**
+ * A flag to check should resume after app become active.
+ */
+@property(nonatomic, assign)BOOL shouldResumeBecomeActive;
+
 @end
 
 static NSString *JPVideoPlayerURLScheme = @"SystemCannotRecognition";
@@ -400,11 +405,16 @@ static NSString *JPVideoPlayerURL = @"www.newpan.com";
 }
 
 - (void)appDidEnterBackground{
-    [self.currentPlayVideoItem pausePlayVideo];
+    if (self.currentPlayVideoItem.isPlaying) {
+        self.currentPlayVideoItem.shouldResumeBecomeActive = YES;
+        [self.currentPlayVideoItem pausePlayVideo];
+    }
 }
 
 - (void)appDidEnterPlayGround{
-    [self.currentPlayVideoItem resumePlayVideo];
+    if (self.currentPlayVideoItem.shouldResumeBecomeActive) {
+        [self.currentPlayVideoItem resumePlayVideo];
+    }
 }
 
 
