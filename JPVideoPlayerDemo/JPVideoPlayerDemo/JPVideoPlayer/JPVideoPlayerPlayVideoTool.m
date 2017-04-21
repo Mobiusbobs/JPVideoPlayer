@@ -75,9 +75,9 @@ CGFloat const JPVideoPlayerLayerFrameY = 2;
 @property(nonatomic, strong, nonnull)NSString *playingKey;
 
 /**
- * A flag to check should resume after app become active.
+ * A flag to check should pause after app become active.
  */
-@property(nonatomic, assign)BOOL shouldResumeBecomeActive;
+@property(nonatomic, assign)BOOL shouldPauseBecomeActive;
 
 @end
 
@@ -405,14 +405,23 @@ static NSString *JPVideoPlayerURL = @"www.newpan.com";
 }
 
 - (void)appDidEnterBackground{
-    if (self.currentPlayVideoItem.isPlaying) {
-        self.currentPlayVideoItem.shouldResumeBecomeActive = YES;
+    if (!self.currentPlayVideoItem.isPlaying) {
+        self.currentPlayVideoItem.shouldPauseBecomeActive = YES;
+    } else {
         [self.currentPlayVideoItem pausePlayVideo];
     }
+
+    BOOL shouldPause = self.currentPlayVideoItem.shouldPauseBecomeActive;
+    NSLog(@"shouldPauseDidEnterBackground:%@",shouldPause? @"YES" : @"NO");
 }
 
 - (void)appDidEnterPlayGround{
-    if (self.currentPlayVideoItem.shouldResumeBecomeActive) {
+    BOOL shouldPause = self.currentPlayVideoItem.shouldPauseBecomeActive;
+    NSLog(@"shouldPauseBecomeActive:%@",shouldPause? @"YES" : @"NO");
+    if (self.currentPlayVideoItem.shouldPauseBecomeActive) {
+        self.currentPlayVideoItem.shouldPauseBecomeActive = NO;
+    } else {
+        NSLog(@"Resume");
         [self.currentPlayVideoItem resumePlayVideo];
     }
 }
@@ -452,11 +461,15 @@ static NSString *JPVideoPlayerURL = @"www.newpan.com";
                 
                 // When get ready to play note, we can go to play, and can add the video picture on show view.
                 if (!self.currentPlayVideoItem) return;
+                NSLog(@"AVPlayerItemStatusReadyToPlay");
                 
-                [self.currentPlayVideoItem.player play];
-                [self hideActivaityIndicatorView];
+                if (!self.currentPlayVideoItem.shouldPauseBecomeActive) {
+                    [self.currentPlayVideoItem.player play];
+                    [self hideActivaityIndicatorView];
+                    
+                    [self displayVideoPicturesOnShowLayer];
+                }
                 
-                [self displayVideoPicturesOnShowLayer];
             }
                 break;
                 
