@@ -74,6 +74,11 @@ CGFloat const JPVideoPlayerLayerFrameY = 2;
  */
 @property(nonatomic, strong, nonnull)NSString *playingKey;
 
+/**
+ * A flag to check should pause after app become active.
+ */
+@property(nonatomic, assign)BOOL shouldPauseBecomeActive;
+
 @end
 
 static NSString *JPVideoPlayerURLScheme = @"SystemCannotRecognition";
@@ -400,11 +405,22 @@ static NSString *JPVideoPlayerURL = @"www.newpan.com";
 }
 
 - (void)appDidEnterBackground{
-    [self.currentPlayVideoItem pausePlayVideo];
+    if (!self.currentPlayVideoItem.isPlaying) {
+        self.currentPlayVideoItem.shouldPauseBecomeActive = YES;
+    } else {
+        [self.currentPlayVideoItem pausePlayVideo];
+    }
+    
+    BOOL shouldPause = self.currentPlayVideoItem.shouldPauseBecomeActive;
 }
 
 - (void)appDidEnterPlayGround{
-    [self.currentPlayVideoItem resumePlayVideo];
+    BOOL shouldPause = self.currentPlayVideoItem.shouldPauseBecomeActive;
+    if (self.currentPlayVideoItem.shouldPauseBecomeActive) {
+        self.currentPlayVideoItem.shouldPauseBecomeActive = NO;
+    } else {
+        [self.currentPlayVideoItem resumePlayVideo];
+    }
 }
 
 
@@ -443,10 +459,13 @@ static NSString *JPVideoPlayerURL = @"www.newpan.com";
                 // When get ready to play note, we can go to play, and can add the video picture on show view.
                 if (!self.currentPlayVideoItem) return;
                 
-                [self.currentPlayVideoItem.player play];
-                [self hideActivaityIndicatorView];
+                if (!self.currentPlayVideoItem.shouldPauseBecomeActive) {
+                    [self.currentPlayVideoItem.player play];
+                    [self hideActivaityIndicatorView];
+                    
+                    [self displayVideoPicturesOnShowLayer];
+                }
                 
-                [self displayVideoPicturesOnShowLayer];
             }
                 break;
                 
