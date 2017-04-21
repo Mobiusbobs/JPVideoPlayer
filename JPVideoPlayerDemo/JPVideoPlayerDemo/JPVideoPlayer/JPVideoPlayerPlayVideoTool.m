@@ -19,7 +19,7 @@ CGFloat const JPVideoPlayerLayerFrameY = 2;
 
 @interface JPVideoPlayerPlayVideoToolItem()
 
-/** 
+/**
  * The playing URL
  */
 @property(nonatomic, strong, nullable)NSURL *url;
@@ -73,11 +73,6 @@ CGFloat const JPVideoPlayerLayerFrameY = 2;
  * The current playing url key.
  */
 @property(nonatomic, strong, nonnull)NSString *playingKey;
-
-/**
- * A flag to check should pause after app become active.
- */
-@property(nonatomic, assign)BOOL shouldPauseBecomeActive;
 
 @end
 
@@ -175,7 +170,7 @@ static NSString *JPVideoPlayerURL = @"www.newpan.com";
         if (error) error([NSError errorWithDomain:@"the file path is disable" code:0 userInfo:nil]);
         return nil;
     }
-
+    
     if (!showView) {
         if (error) error([NSError errorWithDomain:@"the layer to display video layer is nil" code:0 userInfo:nil]);
         return nil;
@@ -405,25 +400,11 @@ static NSString *JPVideoPlayerURL = @"www.newpan.com";
 }
 
 - (void)appDidEnterBackground{
-    if (!self.currentPlayVideoItem.isPlaying) {
-        self.currentPlayVideoItem.shouldPauseBecomeActive = YES;
-    } else {
-        [self.currentPlayVideoItem pausePlayVideo];
-    }
-
-    BOOL shouldPause = self.currentPlayVideoItem.shouldPauseBecomeActive;
-    NSLog(@"shouldPauseDidEnterBackground:%@",shouldPause? @"YES" : @"NO");
+    [self.currentPlayVideoItem pausePlayVideo];
 }
 
 - (void)appDidEnterPlayGround{
-    BOOL shouldPause = self.currentPlayVideoItem.shouldPauseBecomeActive;
-    NSLog(@"shouldPauseBecomeActive:%@",shouldPause? @"YES" : @"NO");
-    if (self.currentPlayVideoItem.shouldPauseBecomeActive) {
-        self.currentPlayVideoItem.shouldPauseBecomeActive = NO;
-    } else {
-        NSLog(@"Resume");
-        [self.currentPlayVideoItem resumePlayVideo];
-    }
+    [self.currentPlayVideoItem resumePlayVideo];
 }
 
 
@@ -461,15 +442,11 @@ static NSString *JPVideoPlayerURL = @"www.newpan.com";
                 
                 // When get ready to play note, we can go to play, and can add the video picture on show view.
                 if (!self.currentPlayVideoItem) return;
-                NSLog(@"AVPlayerItemStatusReadyToPlay");
                 
-                if (!self.currentPlayVideoItem.shouldPauseBecomeActive) {
-                    [self.currentPlayVideoItem.player play];
-                    [self hideActivaityIndicatorView];
-                    
-                    [self displayVideoPicturesOnShowLayer];
-                }
+                [self.currentPlayVideoItem.player play];
+                [self hideActivaityIndicatorView];
                 
+                [self displayVideoPicturesOnShowLayer];
             }
                 break;
                 
